@@ -31,8 +31,7 @@ function runner(iterator) {
   return new Promise( (resolve) => {
 
     function executer(generator, yieldValue){
-
-      let next = generator.next(yieldValue);
+      const next = generator.next(yieldValue);
       let { value, done } = next;
       
       if (done) {
