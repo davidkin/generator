@@ -29,29 +29,30 @@ function runner(iterator) {
   const resultArr = [];
 
   return new Promise( (resolve) => {
+
     function executer(generator, yieldValue){
+
       let next = generator.next(yieldValue);
       let { value, done } = next;
       
       if (done) {
-        resolve(resultArr);
-      } else {
-
-        if (value instanceof Promise) {
-          value.then( result => {
-              resultArr.push(result);
-              executer(generator, result);
-            }
-          );
-        } else if ( typeof value === 'function') {
-          resultArr.push(value());
-          executer(generator, value())
-        } else {
-          resultArr.push(value);
-          executer(generator, value);
-        }
+        return resolve(resultArr);
       }
-  }
+
+      if (value instanceof Promise) {
+          return value.then( result => {
+            resultArr.push(result);
+            executer(generator, result);
+          }
+        );
+      } else if ( typeof value === 'function') {
+        resultArr.push(value());
+        return executer(generator, value())
+      } 
+
+      resultArr.push(value);
+      executer(generator, value);
+    }
 
     executer(iterator)
   });
