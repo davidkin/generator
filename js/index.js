@@ -1,3 +1,28 @@
+function sum() {
+  console.log(1);
+  return [].reduce.call(arguments, (acc, el) => acc+=el);
+}
+
+const prom = x => new Promise(res => {
+  console.log(2);
+  setTimeout(res,2000,x);
+})
+
+function pow() {
+  console.log(3);
+  return [].reduce.call(arguments, (acc, el) => acc*=el);
+}
+
+const arr = [1,2,3,4]
+
+function *gen() {
+  const a = yield sum.bind(null, ...arr);
+  const b = yield prom(a);
+  const c = yield pow.bind(null, ...arr);
+  const d = yield arr;
+  yield a + b + c + d;
+}
+
 const iterator = gen();
 
 function runner(iterator) {
@@ -6,10 +31,12 @@ function runner(iterator) {
   return new Promise( (resolve) => {
     function executer(generator, yieldValue){
       let next = generator.next(yieldValue);
-
       let { value, done } = next;
       
-      if (!done) {
+      if (done) {
+        resolve(resultArr);
+      } else {
+
         if (value instanceof Promise) {
           value.then( result => {
               resultArr.push(result);
@@ -23,10 +50,8 @@ function runner(iterator) {
           resultArr.push(value);
           executer(generator, value);
         }
-      } else {
-        resolve(resultArr);
       }
-    }
+  }
 
     executer(iterator)
   });
